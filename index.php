@@ -13,45 +13,36 @@
 </head>
 
 <body>
-  <section class="box columns">
-    <div class=" column" >
+  <section class="container box is-flex-direction-row ">
+    <div class=" row is-half " >
 
-      <h1 class="title">
-        Add Todo
+      <h1 class="title has-text-centered has-text-black has-background-info">
+       TODOLIST
       </h1>
 
 
-      <form class=" align-items-center" method="POST">
+      <form method="POST">
         <div class="field">
           <label for="addtodo" class="label">New Todo</label>
           <input class="input is-danger" id="addtodo" type="text" placeholder="Add Todo" name="todoItem">
         </div>
-        <div class="field">
-          <label for="addtododesc" class="label">Description</label>
-          <input class="textarea has-fixed-size" id="addtododesc" type="text" placeholder="Todo Description"
-            name="todoDescription">
-        </div>
-        <div class="field">
-          <button name="submit" type="submit" class="button is-success m-50">Submit</button>
+       
+        <div class="field has-text-centered">
+          <input name="submit" type="submit" class="button is-success m-50">
         </div>
 
       </form>
     </div>
-    <form class="form column" method="POST">
+
+    <form class="row is-half" method="POST">
       <h1 class="title"> Edit </h1>
      <input type="hidden" id="id" name="id" value="<?php echo$id?>">
       <div class="field">
-          <label for="addtodo" class="label">Update Todo</label>
+          <label for="addtodo" class="label">Edit Todo</label>
           <input class="input is-danger is-required" id="todo_item" type="text" placeholder="Add Todo" value="<?php echo $title;?>" name="todo_item">
         </div>
         
-        <div class="field">
-          <label for="addtododesc" class="label">Description</label>
-          <input class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Change Description"
-           value="<?php echo $description;?>"
-            name="todo_desc">
-        </div>
-        <div class="field">
+        <div class="field has-text-centered">
           <button name="update" type="submit" class="button is-warning left">Update</button>
         </div>
 
@@ -68,9 +59,8 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col"> Item </th>
-          <th scope="col"> Description </th>
           <th scope="col">Date</th>
-          <th scope="col" colspan="3"> Edit/Delete </th>
+          <th scope="col" colspan="3"> Actions </th>
         </tr>
         <thead>
 
@@ -93,9 +83,7 @@
             <tr>
             <td scope="row"> <?php echo $row['id'] ?> </td>
             <td> <?php echo $row['todo_item'] ?> </td>
-            <td>
-               <?php echo $row['todo_desc'] ?>
-            </td>
+          
             <td> <?php echo $row['date'] ?> </td>
             <td>
               <a href="index.php?edit=<?php echo $row['id'];?>" class="button is-info">EDIT</a>
@@ -104,7 +92,7 @@
               <a href="index.php?delete=<?php echo $row['id'];?>" class="button is-danger">DELETE</a>
             </td>
             <td>
-              <a href="index.php?complete=<?php echo $row['id'];?>" class="button is-success">Complete</a>
+            <a href="index.php?complete=<?php echo $row['id'];?> "  class="button is-success">Complete</a> 
             </td>
 
           </tr>
