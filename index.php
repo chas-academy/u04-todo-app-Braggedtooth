@@ -8,62 +8,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
- 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
-
+<!-- ?php if(isset($_SESSION['message'])){
+  echo"<div class= \"notification ". $_SESSION['msg_type']." box>" ."<button class=\"delete" ." onclick=\"remButton()>"."</button>". "<h2>" .$_SESSION['message']."</div>";
+} else {
+  echo "<div class='hidden'> <div>";
+};
+  ?>  -->
 <body>
+<!-- Notification for SESSION variable -->
+<?php
+if(isset($_SESSION['message'])):?>
 <div class="notification <?php echo $_SESSION['msg_type']?> box">
-  <button class="delete" onclick="remButton()"></button>
-  <?php echo $_SESSION['message']?>
-</div>
-  <section class="container box is-flex-direction-row ">
-    <div class=" row is-half " >
-
-      <h1 class="title has-text-centered has-text-black has-background-info">
-       TODOLIST
-      </h1>
-
-
-      <form method="POST">
-        <div class="field">
-          <label for="addtodo" class="label">New Todo</label>
-          <input class="input is-danger" id="addtodo" type="text" placeholder="Add Todo" name="todoItem">
-        </div>
-       
-        <div class="field has-text-centered">
-          <input name="submit" type="submit" class="button is-success m-50">
-        </div>
-
-      </form>
-    </div>
-
-    <form class="row is-half" method="POST">
-      <h1 class="title"> Edit </h1>
-     <input type="hidden" id="id" name="id" value="<?php echo$id?>">
-      <div class="field">
-          <label for="addtodo" class="label">Edit Todo</label>
-          <input class="input is-danger is-required" id="todo_item" type="text" placeholder="Add Todo" value="<?php echo $title;?>" name="todo_item">
-        </div>
+    <button class="delete" onclick="remButton()"></button>
+    <?php echo $_SESSION['message']?>
+  </div> 
+  <?php endif ?>
+  
+ <!--heading -->
+  <h1 class="title has-text-centered has-text-black has-background-info">
+          TODOLIST
+        </h1>
+  <section class="section columns">
         
+    <section class="container box is-flex-direction-row column is-two-fifths">
+      <div class=" row is-half ">
+
+        
+
+<!-- Input for Adding New Task -->
+        <form method="POST">
+        <h1 class="title has-text-centered has-text-success-light has-background-link-dark"> Add Task </h1>
+          <div class="field">
+            <label for="addtodo" class="label">New Task</label>
+            <input class="input is-primary" id="addtodo" type="text" placeholder="Task Name" name="todoItem">
+          </div>
+          <div class="field">
+            <label for="addtododesc" class="label">Description</label>
+            <textarea class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Todo Description"
+              name="todoDescription"> </textarea>
+          </div>
+
+          <div class="field has-text-centered">
+            <input name="submit" type="submit" class="button is-success m-50">
+          </div>
+
+        </form>
+      </div>
+ <!-- Input for Edit Task-->
+      <form class="row is-half" method="POST">
+        <h1 class="title has-text-centered has-text-warning has-background-info-dark mt-5"> Edit </h1>
+        <input type="hidden" id="id" name="id" value="<?php echo$id?>">
+        <div class="field">
+          <label for="addtodo" class="label"> Task Name</label>
+          <input class="input is-danger is-required" id="todo_item" type="text" placeholder="Edit Todo"
+            value="<?php echo $title;?>" name="todo_item">
+        </div>
+        <div class="field">
+          <label for="addtododesc" class="label">Description</label>
+          <textarea class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Change Description"
+            value="<?php echo $description;?>" name="todo_desc"> </textarea>
+        </div>
+
         <div class="field has-text-centered">
           <button name="update" type="submit" class="button is-warning left">Update</button>
         </div>
 
-    </form>
-
-   
+      </form>
 
 
 
-</section>
 
 
-<table class="container table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    </section>
+
+
+    <table class="box table is-bordered is-striped is-narrow is-fullwidth column is-9 is-offset-1">
       <thead>
         <tr>
           <th scope="col">#</th>
           <th scope="col"> Item </th>
+          <th scope="col"> Description </th>
           <th scope="col">Date</th>
           <th scope="col" colspan="3"> Actions </th>
         </tr>
@@ -81,11 +108,14 @@
 //gör  en if vilkor som visar en FORM där användare kan ändra TODO
     ?>
           <?php while ($row = $display_data->fetch_assoc()): ?>
-            <?php echo $row['complete'] ?>
-            <tr>
+
+          <tr>
             <td scope="row"> <?php echo $row['id'] ?> </td>
             <td> <?php echo $row['todo_item'] ?> </td>
-          
+            <td>
+              <?php echo $row['todo_desc'] ?>
+            </td>
+
             <td> <?php echo $row['date'] ?> </td>
             <td>
               <a href="index.php?edit=<?php echo $row['id'];?>" class="button is-info">EDIT</a>
@@ -93,13 +123,13 @@
             <td>
               <a href="index.php?delete=<?php echo $row['id'];?>" class="button is-danger">DELETE</a>
             </td>
-            <td> 
-          <?php if($row['complete']== "1"){
+            <td>
+              <?php if($row['complete']== "1"){
                echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-success\">Task Complete</a>" ;
             } else{
               echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-warning\">Complete Task</a>" ;
             } ?>
-          
+
             </td>
 
           </tr>
@@ -109,15 +139,15 @@
 
 
 
+  </section>
 
-  
   <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
   <script>
-  const rembtn = document.querySelector('.notification');
-   function remButton(){
-     rembtn.remove();
-   }
+    const rembtn = document.querySelector('.notification');
 
+    function remButton() {
+      rembtn.remove();
+    }
   </script>
 </body>
 
