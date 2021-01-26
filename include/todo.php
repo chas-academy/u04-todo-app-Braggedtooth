@@ -4,21 +4,38 @@ session_start();
 
 $title ="";
 $description =" ";
+//connect to database
 db();
 global $mysqli;
-    if(isset($_POST['submit'])){
-        $title = $_POST['todoItem'];
-        $mysqli->query("INSERT INTO `user`( `todo_item`, `date`)VALUES ('$title', CURRENT_TIME())")or die($mysqli->error) ;
-        $_SESSION['message'] ="Todo Added!";
-        $_SESSION['msg_type'] ="is-success";
 
-    };
+
+
+    
+   
+        if(isset($_POST['submit'])){
+            $title = $_POST['todoItem'];
+           
+            if ($title !=""){
+                $mysqli->query("INSERT INTO `user`( `todo_item`, `date`)VALUES ('$title', CURRENT_TIME())")or die($mysqli->error) ;
+                $_SESSION['message'] = "Todo Added Successfully";
+                $_SESSION['msg_type'] ="is-success";
+            }else {
+                $_SESSION['message'] = "Input Invalid ";
+                header("location:index.php");
+            }
+    
+        };
+    
+
+
+    
 
     if(isset($_GET['delete'])){
         $id = $_GET['delete'];
         $mysqli->query("DELETE FROM `user` WHERE id = $id") or die($mysqli->error) ;
         $_SESSION['message'] ="Todo Deleted!";
-        $_SESSION['msg_type'] ="danger";
+        $_SESSION['msg_type'] ="is-danger";
+        
     }
     if( isset($_GET['edit'])){
         $id = $_GET['edit'];
@@ -31,30 +48,73 @@ global $mysqli;
        
     }
 
-    if(isset($_POST['update'])){
+    if (isset($_POST['update'])) {
         $id= $_POST['id'];
         $title =$_POST['todo_item'];
-        $mysqli->query("UPDATE `user` SET `todo_item` = '$title'  WHERE id=$id ") or die($mysqli->error);
-        $_SESSION['message'] ="Todo Updated!";
-        $_SESSION['msg_type'] ="is-warning";
+        if ($title !="") {
+            $mysqli->query("UPDATE `user` SET `todo_item` = '$title'  WHERE id=$id ") or die($mysqli->error);
+            $_SESSION['message'] ="Todo Updated!";
+            $_SESSION['msg_type'] ="is-warning";
+        }else {
+            $_SESSION['message'] ="Press EDIT on the item you want to update";
+            $_SESSION['msg_type'] ="is-warning";
+        }
     }
     //check if task is done
-   
+    $done= 0 ;
+    
     if(isset($_GET['complete'])){
+        global $done;
+        global $id;
         $id = $_GET['complete']; 
         $complete = $mysqli->query("SELECT `complete` FROM `user` WHERE id = $id") or die($mysqli->error);
         $row = $complete->fetch_assoc();
         $done = (int)$row['complete'] ;
-         if ($done === 0){
-            $done = 1;
-        } else { 
+          if ($done == 0){
+              $done = 1;
+              
+            } else { 
             $done = 0;
+           
+
+            
         };  
-        
-       
-          var_dump($done);
+       /*  if ($task_complete == false|| $done== 0){
+            $complete_class = 'is-warning';
+            $complete_btn = 'Complete Task';
+          
+        } else{
+            $complete_class = 'is-success';
+            $complete_btn = 'Task Complete';
+        };  */ 
+
             $mysqli -> query("UPDATE `user` SET `complete`= '$done' WHERE id=$id ") or die($mysqli->error);
-        };
+        }; 
+        
+//complete class and text changes 
+
+
+
+      
+        /*     if (isset($_GET['complete'])==$id||$done==1){
+                $complete_class = 'is-success';
+                $complete_btn = 'Task Complete';
+               
+
+            }else {
+                 $complete_class = 'is-warning';
+                 $complete_btn = 'Complete Task';
+            }; */
+            
+          /*   global $done;
+            global $id;
+            if($done == 0){
+                echo `<a href="index.php?complete=<?php echo $id;?>" class="button is-warning">Complete Task</a>`;
+                 }else{ echo `<a href="index.php?complete=<?php echo $id;?>" class="button is-success">Task Completed </a>`;}; */
+                      
+          
+      
+
 
       
     //fecth_array returnerar en string därav inability att ändrar complete status med funtionen ovan.

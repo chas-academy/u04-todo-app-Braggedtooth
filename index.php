@@ -13,6 +13,10 @@
 </head>
 
 <body>
+<div class="notification <?php echo $_SESSION['msg_type']?> box">
+  <button class="delete" onclick="remButton()"></button>
+  <?php echo $_SESSION['message']?>
+</div>
   <section class="container box is-flex-direction-row ">
     <div class=" row is-half " >
 
@@ -54,6 +58,7 @@
 
 </section>
 
+
 <table class="container table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
       <thead>
         <tr>
@@ -76,7 +81,7 @@
 //gör  en if vilkor som visar en FORM där användare kan ändra TODO
     ?>
           <?php while ($row = $display_data->fetch_assoc()): ?>
-       
+            <?php echo $row['complete'] ?>
             <tr>
             <td scope="row"> <?php echo $row['id'] ?> </td>
             <td> <?php echo $row['todo_item'] ?> </td>
@@ -88,8 +93,13 @@
             <td>
               <a href="index.php?delete=<?php echo $row['id'];?>" class="button is-danger">DELETE</a>
             </td>
-            <td>
-            <a href="index.php?complete=<?php echo $row['id'];?>" class="button is-success">Complete</a> 
+            <td> 
+          <?php if($row['complete']== "1"){
+               echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-success\">Task Complete</a>" ;
+            } else{
+              echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-warning\">Complete Task</a>" ;
+            } ?>
+          
             </td>
 
           </tr>
@@ -102,6 +112,12 @@
 
   
   <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+  <script>
+  const rembtn = document.querySelector('.notification');
+   function remButton(){
+     rembtn.remove();
+   }
+
   </script>
 </body>
 
