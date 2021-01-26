@@ -1,0 +1,12 @@
+@import 'bulma/css/bulma.css';
+
+.notification{
+    display: flex!important;
+    justify-content: center!important;
+    font-size: large!important;
+    position: absolute;
+    top: 40px;
+    right: 50px;   
+    width: 15% !important;
+}
+

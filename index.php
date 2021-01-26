@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="style\style.css">
 </head>
 <!-- ?php if(isset($_SESSION['message'])){
   echo"<div class= \"notification ". $_SESSION['msg_type']." box>" ."<button class=\"delete" ." onclick=\"remButton()>"."</button>". "<h2>" .$_SESSION['message']."</div>";
@@ -21,7 +21,7 @@
 <!-- Notification for SESSION variable -->
 <?php
 if(isset($_SESSION['message'])):?>
-<div class="notification <?php echo $_SESSION['msg_type']?> box">
+<div class="notification has-text-dark  has-text-center <?php echo $_SESSION['msg_type']?> box">
     <button class="delete" onclick="remButton()"></button>
     <?php echo $_SESSION['message']?>
   </div> 
@@ -43,12 +43,12 @@ if(isset($_SESSION['message'])):?>
         <h1 class="title has-text-centered has-text-success-light has-background-link-dark"> Add Task </h1>
           <div class="field">
             <label for="addtodo" class="label">New Task</label>
-            <input class="input is-primary" id="addtodo" type="text" placeholder="Task Name" name="todoItem">
+            <input class="input is-primary" id="addtodo" type="text" placeholder="Task Name" name="todo_item" autofocus>
           </div>
           <div class="field">
             <label for="addtododesc" class="label">Description</label>
             <textarea class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Todo Description"
-              name="todoDescription"> </textarea>
+              name="todo_desc"> </textarea>
           </div>
 
           <div class="field has-text-centered">
@@ -59,7 +59,7 @@ if(isset($_SESSION['message'])):?>
       </div>
  <!-- Input for Edit Task-->
       <form class="row is-half" method="POST">
-        <h1 class="title has-text-centered has-text-warning has-background-info-dark mt-5"> Edit </h1>
+        <h1 class="title has-text-centered has-text-warning has-background-info-dark mt-5"> Edit Task </h1>
         <input type="hidden" id="id" name="id" value="<?php echo$id?>">
         <div class="field">
           <label for="addtodo" class="label"> Task Name</label>
@@ -68,7 +68,7 @@ if(isset($_SESSION['message'])):?>
         </div>
         <div class="field">
           <label for="addtododesc" class="label">Description</label>
-          <textarea class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Change Description"
+          <textarea class="textarea has-fixed-size is-primary" id="todo_desc" type="text" placeholder="Change Description"
             value="<?php echo $description;?>" name="todo_desc"> </textarea>
         </div>
 
@@ -125,7 +125,7 @@ if(isset($_SESSION['message'])):?>
             </td>
             <td>
               <?php if($row['complete']== "1"){
-               echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-success\">Task Complete</a>" ;
+               echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-success\">Task Completed</a>" ;
             } else{
               echo "<a href=\"index.php?complete=".$row['id']."\" class=\"button is-warning\">Complete Task</a>" ;
             } ?>

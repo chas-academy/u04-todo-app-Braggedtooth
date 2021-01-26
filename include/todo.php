@@ -13,12 +13,12 @@ global $mysqli;
     
    
         if(isset($_POST['submit'])){
-            $title = $_POST['todoItem'];
-            $description = $_POST['todoDescription'];
+            $title = $_POST['todo_item'];
+            $description = $_POST['todo_desc'];
            
             if ($title !=""){
                 $mysqli->query("INSERT INTO `user`( `todo_item`,`todo_desc`, `date`)VALUES ('$title','$description', CURRENT_TIME())")or die($mysqli->error) ;
-                $_SESSION['message'] = "Todo Added Successfully";
+                $_SESSION['message'] = "Task Added ";
                 $_SESSION['msg_type'] ="is-success";
             }else {
                 $_SESSION['message'] = "Input Invalid ";
@@ -34,7 +34,7 @@ global $mysqli;
     if(isset($_GET['delete'])){
         $id = $_GET['delete'];
         $mysqli->query("DELETE FROM `user` WHERE id = $id") or die($mysqli->error) ;
-        $_SESSION['message'] ="Todo Deleted!";
+        $_SESSION['message'] ="Task Deleted!";
         $_SESSION['msg_type'] ="is-danger";
         
     }
@@ -44,6 +44,8 @@ global $mysqli;
             $row = $check->fetch_array();
             $title = $row['todo_item'];
             $description = $row['todo_desc'];
+            $_SESSION['message'] ="Edit Task!";
+            $_SESSION['msg_type'] ="is-link";
             
        
             //Hämtar datan med id och lägg i en ny formulär så att användaren kan se och sedan kunna ändra. 
@@ -59,7 +61,7 @@ global $mysqli;
             $_SESSION['message'] ="Todo Updated!";
             $_SESSION['msg_type'] ="is-warning";
         }else {
-            $_SESSION['message'] ="Press EDIT on the item you want to update";
+            $_SESSION['message'] ="Press EDIT ";
             $_SESSION['msg_type'] ="is-warning";
         }
     }
@@ -75,9 +77,13 @@ global $mysqli;
         $done = (int)$row['complete'] ;
           if ($done == 0){
               $done = 1;
+              $_SESSION['message'] ="Task Completed!";
+              $_SESSION['msg_type'] ="is-success";
               
             } else { 
             $done = 0;
+            $_SESSION['message'] ="Task Incomplete!";
+              $_SESSION['msg_type'] ="is-info";
            
 
             
