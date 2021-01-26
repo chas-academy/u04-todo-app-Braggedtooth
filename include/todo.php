@@ -43,18 +43,20 @@ global $mysqli;
     if(isset($_GET['complete'])){
         $id = $_GET['complete']; 
         $complete = $mysqli->query("SELECT `complete` FROM `user` WHERE id = $id") or die($mysqli->error);
-        $row = $complete->fetch_array();
-        $done = $row['complete'] ;
-        /* if ($done === 0){
-            $done === 1;
+        $row = $complete->fetch_assoc();
+        $done = (int)$row['complete'] ;
+         if ($done === 0){
+            $done = 1;
         } else { 
-            $done === 0;
-        }; */
-          var_dump($row['todo_item']);
+            $done = 0;
+        };  
+        
+       
+          var_dump($done);
             $mysqli -> query("UPDATE `user` SET `complete`= '$done' WHERE id=$id ") or die($mysqli->error);
         };
 
-
+      
     //fecth_array returnerar en string därav inability att ändrar complete status med funtionen ovan.
         
        

@@ -76,10 +76,7 @@
 //gör  en if vilkor som visar en FORM där användare kan ändra TODO
     ?>
           <?php while ($row = $display_data->fetch_assoc()): ?>
-          <?php $item_id = '#'. strval($row['id']);
-                 $item_target = strval($row['id']); 
-          ?>
-
+       
             <tr>
             <td scope="row"> <?php echo $row['id'] ?> </td>
             <td> <?php echo $row['todo_item'] ?> </td>
@@ -92,11 +89,11 @@
               <a href="index.php?delete=<?php echo $row['id'];?>" class="button is-danger">DELETE</a>
             </td>
             <td>
-            <a href="index.php?complete=<?php echo $row['id'];?> "  class="button is-success">Complete</a> 
+            <a href="index.php?complete=<?php echo $row['id'];?>" class="button is-success">Complete</a> 
             </td>
 
           </tr>
-          <?php endwhile;?>
+          <?php endwhile ?>
     </table>
 
 
