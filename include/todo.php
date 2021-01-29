@@ -7,7 +7,7 @@ $description =" ";
 //connect to database
 db();
 global $mysqli;
-
+$updatebtn = "disabled";
 
 
     
@@ -16,10 +16,11 @@ global $mysqli;
             $title = $_POST['todo_item'];
             $description = $_POST['todo_desc'];
            
-            if (empty($title)) {
-                $_SESSION['message'] = "Input Invalid ";
+            if (empty($description)) {
+                $_SESSION['message'] = "Describe Task !";
+                $_SESSION['msg_type'] ="is-danger";
             } else {
-                $mysqli->query("INSERT INTO `user`( `todo_item`,`todo_desc`, `date`)VALUES ('$title','$description', CURRENT_TIME())")or die($mysqli->error) ;
+                $mysqli->query("INSERT INTO `todos`( `todo_item`,`todo_desc`, `date`)VALUES ('$title','$description', CURRENT_TIME())")or die($mysqli->error) ;
                 $_SESSION['message'] = "Task Added ";
                 $_SESSION['msg_type'] ="is-success";
             }
@@ -28,39 +29,45 @@ global $mysqli;
 
 
     
-
+//DELETE FUNCTION
     if (isset($_GET['delete'])) {
         $id = $_GET['delete'];
-        $mysqli->query("DELETE FROM `user` WHERE id = $id") or die($mysqli->error) ;
+        $mysqli->query("DELETE FROM `todos` WHERE id = $id") or die($mysqli->error) ;
         $_SESSION['message'] ="Task Deleted!";
         $_SESSION['msg_type'] ="is-danger";
+        header("location: index.php");
+        exit;
     }
+
+    // EDIT FUNCTION
     if (isset($_GET['edit'])) {
         $id = $_GET['edit'];
-        $check = $mysqli->query("SELECT* FROM `user` WHERE id = $id") or die($mysqli->error);
+        $check = $mysqli->query("SELECT* FROM `todos` WHERE id = $id") or die($mysqli->error);
         $row = $check->fetch_array();
         $title = $row['todo_item'];
         $description = $row['todo_desc'];
+        $updatebtn = " ";
+
         $_SESSION['message'] ="Edit Task!";
         $_SESSION['msg_type'] ="is-link";
-            
+        
+
+     
        
         //Hämtar datan med id och lägg i en ny formulär så att användaren kan se och sedan kunna ändra.
     }
+//UPDATE FUNCTION
+       if (isset($_POST['update'])) {
+           $id= $_POST['id'];
+           $title =$_POST['todo_item'];
+           $description = $_POST['todoDesc'];
+           $mysqli->query("UPDATE `todos` SET `todo_item` = '$title' , `todo_desc`='$description'  WHERE id=$id ") or die($mysqli->error);
+           $_SESSION['message'] ="Task Updated!";
+           $_SESSION['msg_type'] ="is-warning";
+           header("location: index.php");
+           exit;
+       }
 
-    if (isset($_POST['update'])) {
-        $id= $_POST['id'];
-        $title =$_POST['todo_item'];
-        $description = $_POST['todo_desc'];
-        if ($title !="") {
-            $mysqli->query("UPDATE `user` SET `todo_item` = '$title' , `todo_desc`='$description'  WHERE id=$id ") or die($mysqli->error);
-            $_SESSION['message'] ="Todo Updated!";
-            $_SESSION['msg_type'] ="is-warning";
-        } else {
-            $_SESSION['message'] ="Press EDIT ";
-            $_SESSION['msg_type'] ="is-warning";
-        }
-    }
     //check if task is done
     $done= 0 ;
     
@@ -68,21 +75,22 @@ global $mysqli;
         global $done;
         global $id;
         $id = $_GET['complete'];
-        $complete = $mysqli->query("SELECT `complete` FROM `user` WHERE id = $id") or die($mysqli->error);
+        $complete = $mysqli->query("SELECT `complete` FROM `todos` WHERE id = $id") or die($mysqli->error);
         $row = $complete->fetch_assoc();
         $done = (int)$row['complete'] ;
         if ($done == 0) {
             $done = 1;
             $_SESSION['message'] ="Task Completed!";
             $_SESSION['msg_type'] ="is-success";
+            header("location: index.php");
         } else {
             $done = 0;
             $_SESSION['message'] ="Task Incomplete!";
             $_SESSION['msg_type'] ="is-info";
+            header("location: index.php");
         }
         if ($done==1) {
-            $mysqli->query("DELETE FROM `user` WHERE date() < (CURDATE()- INTERVAL  2 DAY)");
-            
+            $mysqli->query("DELETE FROM `todos` WHERE date() < (CURDATE()- INTERVAL  2 DAY)");
         };
         /*  if ($task_complete == false|| $done== 0){
              $complete_class = 'is-warning';
@@ -93,12 +101,17 @@ global $mysqli;
              $complete_btn = 'Task Complete';
          };  */
 
-        $mysqli -> query("UPDATE `user` SET `complete`= '$done' WHERE id=$id ") or die($mysqli->error);
+        $mysqli -> query("UPDATE `todos` SET `complete`= '$done' WHERE id=$id ") or die($mysqli->error);
+        exit;
     };
         
     
-//complete class and text changes
+//COMPLETE ALL TASK!
+/* if (isset($_GET['completall'])) {
+    $mysqli->query("SELECT `complete` FROM `todos` WHERE `complete` = 0") or die($mysqli->error);
 
+    $mysqli->query("UPDATE `todos` SET `complete` = 1 ,   WHERE `complete` = 0") or die($mysqli->error);
+} */
 
 
       

@@ -21,11 +21,14 @@
 <body>
     <!-- Notification for SESSION variable -->
     <?php
+     
 if (isset($_SESSION['message'])):?>
     <div class="notification has-text-dark  has-text-center <?php echo $_SESSION['msg_type']?> box">
         <button class="delete" onclick="remButton()"></button>
-        <?php echo $_SESSION['message']?>
+        <?php echo $_SESSION['message'];?>
     </div>
+
+
     <?php endif ?>
 
     <!--heading -->
@@ -49,8 +52,8 @@ if (isset($_SESSION['message'])):?>
                     </div>
                     <div class="field">
                         <label for="addtododesc" class="label">Description</label>
-                        <textarea class="textarea has-fixed-size" id="todo_desc" type="text"
-                            placeholder="Todo Description" name="todo_desc"> </textarea>
+                        <input class="textarea has-fixed-size" id="todo_desc" type="text" placeholder="Todo Description"
+                            name="todo_desc">
                     </div>
 
                     <div class="field has-text-centered">
@@ -69,14 +72,14 @@ if (isset($_SESSION['message'])):?>
                         value="<?php echo $title;?> " name="todo_item" required>
                 </div>
                 <div class="field">
-                    <label for="addtododesc" class="label">Description</label>
-                    <textarea class="textarea has-fixed-size is-primary" id="todo_desc" type="text"
-                        placeholder="Change Description" value="<?php echo $description;?>"
-                        name="todo_desc"> </textarea>
+                    <label for="todoDesc" class="label">Description</label>
+                    <input class="textarea has-fixed-size is-primary" id="todoDesc" type="text"
+                        placeholder="Change Description" value="<?php echo $description;?>" name="todoDesc">
                 </div>
 
                 <div class="field has-text-centered">
-                    <button name="update" type="submit" class="button is-warning left">Update</button>
+                    <button name="update" type="submit" class="button is-warning left "
+                        <?php echo $updatebtn; ?>>Update</button>
                 </div>
 
             </form>
@@ -89,6 +92,9 @@ if (isset($_SESSION['message'])):?>
 
 
         <table class="box table is-bordered is-striped is-narrow is-fullwidth column is-9 is-offset-1">
+            <!--      <?php
+        echo "<a href=\"index.php?completeall\" class=\"button is-success\">Complete All </a>" ;?> -->
+
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -106,14 +112,11 @@ if (isset($_SESSION['message'])):?>
         print_r($array);
         echo '<pre>';
     }
-    $display_data = $mysqli-> query("SELECT * FROM `user`") or die($mysqli->error);
+    $display_data = $mysqli-> query("SELECT * FROM `todos`") or die($mysqli->error);
 
     //pre_r($display_data->fetch_assoc());
 //gör  en if vilkor som visar en FORM där användare kan ändra TODO
-    ?>
-                    <?php while ($row = $display_data->fetch_assoc()): ?>
-
-                    <tr>
+    ?> <?php while ($row = $display_data->fetch_assoc()): ?> <tr>
                         <td scope="row"> <?php echo $row['id'] ?> </td>
                         <td> <?php echo $row['todo_item'] ?> </td>
                         <td>
