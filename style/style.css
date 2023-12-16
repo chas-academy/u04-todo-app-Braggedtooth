@@ -10,7 +10,9 @@
     padding: 0.5rem;
 }
 
-
+.highlighted {
+    background-color: yellow;
+}
 .extTable {
 
     height: 20em;
