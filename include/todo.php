@@ -2,144 +2,128 @@
 require_once 'db_connect.php';
 session_start();
 
-$title ="";
-$description =" ";
-//connect to database
-db();
-global $mysqli;
+$mysqli = db();
+$title = "";
+$description = "";
+$id = null;
 $updatebtn = "disabled";
 
+function redirect_with_message($location, $message, $msg_type)
+{
+    $_SESSION['message'] = $message;
+    $_SESSION['msg_type'] = $msg_type;
+    header("location: $location");
+    exit;
+}
 
-    
-   
-        if (isset($_POST['submit'])) {
-            $title = $_POST['todo_item'];
-            $description = $_POST['todo_desc'];
-           
-            if (empty($description)) {
-                $_SESSION['message'] = "Describe Task !";
-                $_SESSION['msg_type'] ="is-danger";
-            } else {
-                $mysqli->query("INSERT INTO `todos`( `todo_item`,`todo_desc`, `date`)VALUES ('$title','$description', CURRENT_TIME())")or die($mysqli->error) ;
-                $_SESSION['message'] = "Task Added ";
-                $_SESSION['msg_type'] ="is-success";
-            }
-        };
-    
-
-
-    
-//DELETE FUNCTION
-    if (isset($_GET['delete'])) {
-        $id = $_GET['delete'];
-        $mysqli->query("DELETE FROM `todos` WHERE id = $id") or die($mysqli->error) ;
-        $_SESSION['message'] ="Task Deleted!";
-        $_SESSION['msg_type'] ="is-danger";
-        header("location: index.php");
-        exit;
+function validate_id($id)
+{
+    if (!filter_var($id, FILTER_VALIDATE_INT)) {
+        redirect_with_message("index.php", "Invalid ID", "is-danger");
     }
+    return $id;
+}
 
-    // EDIT FUNCTION
-    if (isset($_GET['edit'])) {
-        $id = $_GET['edit'];
-        $check = $mysqli->query("SELECT* FROM `todos` WHERE id = $id") or die($mysqli->error);
-        $row = $check->fetch_array();
+if (isset($_POST['submit'])) {
+    $title = trim($_POST['todo_item']);
+    $description = trim($_POST['todo_desc']);
+
+    if (empty($description)) {
+        $_SESSION['message'] = "Describe Task !";
+        $_SESSION['msg_type'] = "is-danger";
+    } else {
+        try {
+            $stmt = $mysqli->prepare("INSERT INTO `todos`( `todo_item`,`todo_desc`, `date`) VALUES (?, ?, CURRENT_TIME())");
+            $stmt->execute([$title, $description]);
+            $_SESSION['message'] = "Task Added ";
+            $_SESSION['msg_type'] = "is-success";
+            $title = "";
+            $description = "";
+        } catch (PDOException $e) {
+            $_SESSION['message'] = "Error: " . $e->getMessage();
+            $_SESSION['msg_type'] = "is-danger";
+            $description = " ";
+            $title = "";
+        }
+    }
+};
+
+//DELETE FUNCTION
+if (isset($_GET['delete'])) {
+    $id = validate_id($_GET['delete']);
+    try {
+        $stmt = $mysqli->prepare("DELETE FROM `todos` WHERE id = ?");
+        $stmt->execute([$id]);
+        redirect_with_message("index.php", "Task Deleted!", "is-danger");
+    } catch (PDOException $e) {
+        $_SESSION['message'] = "Error: " . $e->getMessage();
+        $_SESSION['msg_type'] = "is-danger";
+        $description = " ";
+        $title = "";
+    }
+}
+
+// EDIT FUNCTION
+if (isset($_GET['edit'])) {
+    $id = validate_id($_GET['edit']);
+    try {
+        $stmt = $mysqli->prepare("SELECT* FROM `todos` WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $title = $row['todo_item'];
         $description = $row['todo_desc'];
         $updatebtn = " ";
 
-        $_SESSION['message'] ="Edit Task!";
-        $_SESSION['msg_type'] ="is-link";
-        
-
-     
-       
-        //Hämtar datan med id och lägg i en ny formulär så att användaren kan se och sedan kunna ändra.
+        $_SESSION['message'] = "Edit Task!";
+        $_SESSION['msg_type'] = "is-link";
+    } catch (PDOException $e) {
+        $_SESSION['message'] = "Error: " . $e->getMessage();
+        $_SESSION['msg_type'] = "is-danger";
+        $description = " ";
+        $title = "";
     }
+}
+
 //UPDATE FUNCTION
-       if (isset($_POST['update'])) {
-           $id= $_POST['id'];
-           $title =$_POST['todo_item'];
-           $description = $_POST['todoDesc'];
-           $mysqli->query("UPDATE `todos` SET `todo_item` = '$title' , `todo_desc`='$description'  WHERE id=$id ") or die($mysqli->error);
-           $_SESSION['message'] ="Task Updated!";
-           $_SESSION['msg_type'] ="is-warning";
-           header("location: index.php");
-           exit;
-       }
+if (isset($_POST['update'])) {
+    $id = validate_id($_POST['id']);
+    $title = $_POST['todo_item'];
+    $description = $_POST['todoDesc'];
+    try {
+        $stmt = $mysqli->prepare("UPDATE `todos` SET `todo_item` = ? , `todo_desc`= ? WHERE id= ?");
+        $stmt->execute([$title, $description, $id]);
+        redirect_with_message("index.php", "Task Updated!", "is-warning");
+    } catch (PDOException $e) {
+        $_SESSION['message'] = "Error: " . $e->getMessage();
+        $_SESSION['msg_type'] = "is-danger";
+        $description = " ";
+        $title = "";
+    }
+}
 
-    //check if task is done
-    $done= 0 ;
-    
-    if (isset($_GET['complete'])) {
-        global $done;
-        global $id;
-        $id = $_GET['complete'];
-        $complete = $mysqli->query("SELECT `complete` FROM `todos` WHERE id = $id") or die($mysqli->error);
-        $row = $complete->fetch_assoc();
-        $done = (int)$row['complete'] ;
+if (isset($_GET['complete'])) {
+    $id = validate_id($_GET['complete']);
+    try {
+        $stmt = $mysqli->prepare("SELECT `complete` FROM `todos` WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $done = (int)$row['complete'];
+        $_SESSION['clickedRow'] = $id;
         if ($done == 0) {
-            $done = 1;
-            $_SESSION['message'] ="Task Completed!";
-            $_SESSION['msg_type'] ="is-success";
-            header("location: index.php");
+            $stmt = $mysqli->prepare("UPDATE `todos` SET `complete`= '1' WHERE id= ?");
+            $stmt->execute([$id]);
+            redirect_with_message("index.php", "Task Completed!", "is-success");
         } else {
-            $done = 0;
-            $_SESSION['message'] ="Task Incomplete!";
-            $_SESSION['msg_type'] ="is-info";
-            header("location: index.php");
+            $stmt = $mysqli->prepare("UPDATE `todos` SET `complete`= '0' WHERE id= ?");
+            $stmt->execute([$id]);
+            redirect_with_message("index.php", "Task Incomplete!", "is-info");
         }
-        if ($done==1) {
-            $mysqli->query("DELETE FROM `todos` WHERE date() < (CURDATE()- INTERVAL  2 DAY)");
-        };
-        /*  if ($task_complete == false|| $done== 0){
-             $complete_class = 'is-warning';
-             $complete_btn = 'Complete Task';
-
-         } else{
-             $complete_class = 'is-success';
-             $complete_btn = 'Task Complete';
-         };  */
-
-        $mysqli -> query("UPDATE `todos` SET `complete`= '$done' WHERE id=$id ") or die($mysqli->error);
-        exit;
-    };
-        
-    
-//COMPLETE ALL TASK!
-/* if (isset($_GET['completall'])) {
-    $mysqli->query("SELECT `complete` FROM `todos` WHERE `complete` = 0") or die($mysqli->error);
-
-    $mysqli->query("UPDATE `todos` SET `complete` = 1 ,   WHERE `complete` = 0") or die($mysqli->error);
-} */
-
-
-      
-        /*     if (isset($_GET['complete'])==$id||$done==1){
-                $complete_class = 'is-success';
-                $complete_btn = 'Task Complete';
-
-
-            }else {
-                 $complete_class = 'is-warning';
-                 $complete_btn = 'Complete Task';
-            }; */
-            
-          /*   global $done;
-            global $id;
-            if($done == 0){
-                echo `<a href="index.php?complete=<?php echo $id;?>" class="button is-warning">Complete Task</a>`;
-}else{ echo `<a href="index.php?complete=<?php echo $id;?>" class="button is-success">Task Completed </a>`;}; */
-
-
-
-
-
-
-//fecth_array returnerar en string därav inability att ändrar complete status med funtionen ovan.
-
-
-
-
+    } catch (PDOException $e) {
+        $_SESSION['message'] = "Error: " . $e->getMessage();
+        $_SESSION['msg_type'] = "is-danger";
+        $description = " ";
+        $title = "";
+    }
+};
 
 session_destroy();
